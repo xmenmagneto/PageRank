@@ -88,7 +88,21 @@ public class UnitMultiplication {
 
     public static void main(String[] args) throws Exception {
 
+        Configuration conf = new Configuration();
+        Job job = Job.getInstance(conf);
+        job.setJarByClass(UnitMultiplication.class);
 
+        job.setReducerClass(MultiplicationReducer.class);
+
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
+
+        //多个mapper从不同的input读数据，需要告诉每个MapReduce从哪里读取数据
+        MultipleInputs.addInputPath(job, new Path(args[0]), TextInputFormat.class, TransitionMapper.class);
+        MultipleInputs.addInputPath(job, new Path(args[1]), TextInputFormat.class, PRMapper.class);
+
+        FileOutputFormat.setOutputPath(job, new Path(args[2]));
+        job.waitForCompletion(true);
     }
 
 }
