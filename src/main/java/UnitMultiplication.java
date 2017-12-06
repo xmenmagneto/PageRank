@@ -44,7 +44,12 @@ public class UnitMultiplication {
 
         @Override
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-
+            //生成PR Matrix
+            //id\t pr0
+            //outputkey = id
+            //outputValue = pr(n)
+            String[] idPr = value.toString().trim().split("\t");
+            context.write(new Text(idPr[0]), new Text(idPr[1]));
         }
     }
 
