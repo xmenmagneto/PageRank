@@ -59,8 +59,30 @@ public class UnitMultiplication {
         @Override
         public void reduce(Text key, Iterable<Text> values, Context context)
                 throws IOException, InterruptedException {
-            List<String> transitionUnit = new ArrayList<String>();
+            //key = fromId
+            //value = [toId1 = prob, ... , PR(n)]
+            //e.g. fromId = 1; value = [2 = 1/3, 5 = 1/3, 8 = 1/3, 1]
+            //outputKey: toId
+            //outputValue: prob * PR(n)
 
+            double prCell = 0;
+            List<String> transitionCellList = new ArrayList<String>();
+
+            for (Text value : values) {
+                if (value.toString().contains("=")) {
+                    transitionCellList.add(value.toString());
+                } else {
+                    prCell = Double.parseDouble(value.toString());
+                }
+            }
+
+            for (String transCell : transitionCellList) {
+                //transCell : toId = prob
+                String toId = transCell.split("=")[0];
+                double prob = Double.parseDouble(transCell.split("=")[1]);
+                double subPr = prob * prCell;
+                context.write(new Text(toId), new Text(String.valueOf(subPr)));
+            }
         }
     }
 
