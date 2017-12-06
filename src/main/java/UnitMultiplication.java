@@ -21,8 +21,22 @@ public class UnitMultiplication {
 
         @Override
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+            //transition mapper
+            //input: from ID\t to1, to2, to3
+            //outputKey: fromId
+            //outputValue: toId = prob
+            String[] fromTos = value.toString().trim().split("\t");//拆分from and to
 
+            //edge case: fromID\t 后面没了, fromTos.length < 2
+            if (fromTos.length < 2) {
+                return; //面试不能这样写，
+            }
 
+            String from = fromTos[0];
+            String[] tos = fromTos[1].split(",");
+            for (String to: tos) {
+                context.write(new Text(from), new Text(to + "=" + (double) 1 / tos.length));
+            }
         }
     }
 
